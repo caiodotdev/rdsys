@@ -1,0 +1,240 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <style>
+        .panel-success {
+            background: #00b517;
+            color: whitesmoke;
+        }
+
+        .panel-info {
+            background: #2aabd2;
+            color: whitesmoke;
+        }
+
+        .panel-warning {
+            background: #ffc900;
+            color: whitesmoke;
+        }
+
+        .panel-default {
+            background: #7a7a7a;
+            color: whitesmoke;
+        }
+
+        h1.pull-left {
+            font-size: 3em;
+        }
+    </style>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Aberto</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h1 class="pull-left">{{ abertos }}</h1>
+                            <h1 class="pull-right"><i class="fa fa-folder-open"></i></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Em Produção</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h1 class="pull-left">{{ producao }}</h1>
+                            <h1 class="pull-right"><i class="fa fa-refresh"></i></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-success">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Finalizados</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h1 class="pull-left">{{ finalizados }}</h1>
+                            <h1 class="pull-right"><i class="fa fa-check-circle"></i></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-warning">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label>Pedidos Mês</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h1 class="pull-left">{{ pedidos_mes }}</h1>
+                            <h1 class="pull-right"><i class="fa fa-shopping-cart"></i></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="top" class="row">
+        <div class="col-sm-3">
+            <h2> {{ model_name_plural }}</h2>
+        </div>
+        <div class="col-sm-3 col-sm-offset-6">
+            <a href="{% url 'PEDIDO_create' %}" class="btn btn-primary pull-right h2"><i
+                    class="fa fa-plus"></i> Adicionar Pedido
+            </a>
+        </div>
+    </div> <!-- /#top -->
+    <hr/>
+    <form id="advancedForm" method="get" action="{% url 'PEDIDO_list' %}">
+        {% csrf_token %}
+        {#        <div class="row">#}
+        {#            <div class="col-sm-12">#}
+        {##}
+        {#                {{ filter.form.as_p }}#}
+        {#                <button type="button" class="btn btn-default" id="clear"><i class="fa fa-close"></i> Clear</button>#}
+        {##}
+        {##}
+        {#            </div>#}
+        {#        </div>#}
+        {#        <hr/>#}
+        <div id="list" class="row">
+            <div class="col-md-12">
+                <table id="table" class="table table-striped" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>CLIENTE</th>
+                        <th>FORMA_PAGAMENTO</th>
+                        <th>VALOR_TOTAL</th>
+                        <th>VENDEDOR</th>
+                        <th>DATA</th>
+                        <th>STATUS</th>
+                        <th class="actions">AÇÕES</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div> <!-- /#list -->
+    </form>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            function getData() {
+                var formData = $('#advancedForm').serializeArray().reduce(function (obj, item) {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+                return formData;
+            }
+
+            $('#pedido_link').addClass('active');
+            var table = $('#table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "responsive": true,
+                "info": true,
+                "lengthChange": true,
+                "pageLength": 10,
+                dom: "<'row' <'col-xs-6'l><'col-xs-6'f>>rt<'row' <'col-xs-6'Bi><'col-xs-6'p>>",
+                "buttons": [
+                    'copy', 'excel', 'pdf'
+                ],
+                "ajax": {
+                    "url": "{% url 'PEDIDO_list_json' %}",
+                    "data": function (d) {
+                        return $.extend({}, d, getData());
+                    }
+                },
+                columnDefs: [
+                    {
+                        targets: -1,
+                        "render": function (data, type, row, meta) {
+                            return '<div class="row"> <div class="col-xs-6"><a class="btn btn-primary" href="/pedido/' + row[0] + '/"><i\n' +
+                                '                                    class="fa fa-eye"></i></a></div><div class="col-xs-6">' +
+                                '<a class="btn btn-danger" href="/pedido/' + row[0] + '/delete/"> <i\n' +
+                                '                                    class="fa fa-trash"></i></a></div></div>';
+                        }
+                    },
+                    {
+                        targets: 6,
+                        "render": function (data, type, row, meta) {
+                            if (row[6] == 'Finalizado') {
+                                return '<label class="label label-success"><i class="fa fa-check-circle"></i> Finalizado</label>'
+                            }
+                            if (row[6] == 'Aberto') {
+                                return '<label class="label label-default"><i class="fa fa-folder-open"></i> Aberto</label>'
+                            }
+                            if (row[6] == 'Em Produção') {
+                                return '<label class="label label-info"><i class="fa fa-refresh"></i> Em Produção</label>'
+                            }
+                            if (row[6] == 'Pagamento Pendente') {
+                                return '<label class="label label-warning"><i class="fa fa-warning"></i> Pagamento Pendente</label>'
+                            }
+                        }
+                    },
+                ],
+                order: [[0, "desc"]],
+                "language": {
+                    "lengthMenu": "Exibir _MENU_ registros por página",
+                    "zeroRecords": "Nenhum item encontrado",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Nenhum registro disponível",
+                    "emptyTable": "Sem dados disponíveis na tabela",
+                    "infoFiltered": "(filtrado do total de _MAX_ registros)",
+                    "thousands": ".",
+                    "loadingRecords": "Carregando...",
+                    "processing": "Processando...",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primeiro",
+                        "last": "Último",
+                        "next": "Próximo",
+                        "previous": "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending": ": ativar para classificar a coluna ascendente",
+                        "sortDescending": ": ativar para classificar a coluna descendente"
+                    }
+                }
+            });
+
+            $('input').on('keyup', function () {
+                table.search('').draw();
+            });
+
+            $('#clear').click(function () {
+                $("form")[0].reset();
+                table.search('').draw();
+            });
+
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">Visualizar Item</h3>
+
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label>Descricao:</label>
+
+                {{ object.descricao }}
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label>Preco_custo:</label>
+
+                {{ object.preco_custo }}
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label>Valor_unitario:</label>
+
+                {{ object.valor_unitario }}
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label>Foto:</label>
+
+                {{ object.foto }}
+            </div>
+        </div>
+
+    </div>
+    <hr/>
+    <div id="actions" class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" href="{% url 'ITEM_update' item.pk %}">
+                Editar
+            </a>
+            <a href="{% url 'ITEM_list' %}" class="btn btn-default">Voltar</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#item_link').addClass('active');
+        });
+    </script>
+{% endblock %}

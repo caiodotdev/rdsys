@@ -1,0 +1,213 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <style>
+        .panel-success {
+            background: #00b517;
+            color: whitesmoke;
+        }
+
+        .panel-info {
+            background: #2aabd2;
+            color: whitesmoke;
+        }
+
+        .panel-warning {
+            background: #ffc900;
+            color: whitesmoke;
+        }
+
+        .panel-default {
+            background: #7a7a7a;
+            color: whitesmoke;
+        }
+
+        h1.pull-left {
+            font-size: 4.8em;
+        }
+    </style>
+    <div id="top" class="row">
+        <div class="col-sm-3">
+            <h2> Dashboard</h2>
+        </div>
+        <div class="col-sm-9">
+            <a href="{% url 'top_clientes' %}" class="btn btn-warning pull-right">
+                <i class="fa fa-user-secret"></i> Top Clientes
+            </a>
+        </div>
+    </div> <!-- /#top -->
+    <hr/>
+    <form id="advancedForm" method="get" action="{% url 'PEDIDO_list' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Data Inicial:</label>
+                            {{ filter.form.data_inicial }}
+                        </div>
+
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Data Final:</label>
+                            {{ filter.form.data_final }}
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Forma de Pagamento:</label>
+                            {{ filter.form.forma_pagamento }}
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Vendedor:</label>
+                            {{ filter.form.vendedor }}
+                        </div>
+                    </div>
+
+
+                </div>
+                <button type="button" class="btn btn-default" id="clear"><i class="fa fa-close"></i> Limpar</button>
+
+            </div>
+        </div>
+        <hr/>
+        <div id="list" class="row">
+            <div class="col-md-12">
+                <h3>Lista de Pedidos</h3>
+                <table id="table" class="table table-striped" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>CLIENTE</th>
+                        <th>FORMA_PAGAMENTO</th>
+                        <th>VALOR_TOTAL</th>
+                        <th>VENDEDOR</th>
+                        <th>DATA</th>
+                        <th>STATUS</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div> <!-- /#list -->
+    </form>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('input,select').addClass('form-control');
+
+            $('#id_data_inicial').attr('type', 'date');
+            $('#id_data_final').attr('type', 'date');
+
+            function getData() {
+                var formData = $('#advancedForm').serializeArray().reduce(function (obj, item) {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+                return formData;
+            }
+
+            $('#dashboard_link').addClass('active');
+            var table = $('#table').DataTable({
+                "processing": true,
+                responsive: {
+                    breakpoints: [
+                        {name: 'desktop', width: Infinity},
+                        {name: 'tablet', width: 1024},
+                        {name: 'fablet', width: 768},
+                        {name: 'phone', width: 480}
+                    ]
+                },
+                "serverSide": true,
+                "info": true,
+                "lengthChange": true,
+                "pageLength": 10,
+                dom: "<'row' <'col-xs-6'l><'col-xs-6'f>>rt<'row' <'col-xs-6'Bi><'col-xs-6'p>>",
+                "buttons": [
+                    'copy', 'excel', 'pdf'
+                ],
+                "ajax": {
+                    "url": "{% url 'dashboard_json' %}",
+                    "data": function (d) {
+                        return $.extend({}, d, getData());
+                    }
+                },
+                columnDefs: [
+                    {
+                        "targets": -1,
+                        "render": function (data, type, row, meta) {
+                            return '<div class="row"> <div class="col-xs-6"><a class="btn btn-primary" href="/pedido/' + row[0] + '/"><i\n' +
+                                '                                    class="fa fa-eye"></i></a></div><div class="col-xs-6"></div></div>';
+                        }
+                    },
+                    {
+                        "targets": 5,
+                        "render": function (data, type, row) {
+                            if (row[5] == 'Finalizado') {
+                                return '<label class="label label-success"><i class="fa fa-check-circle"></i> Finalizado</label>'
+                            }
+                            if (row[5] == 'Aberto') {
+                                return '<label class="label label-default"><i class="fa fa-folder-open"></i> Aberto</label>'
+                            }
+                            if (row[5] == 'Em Produção') {
+                                return '<label class="label label-info"><i class="fa fa-refresh"></i> Em Produção</label>'
+                            }
+                            if (row[5] == 'Pagamento Pendente') {
+                                return '<label class="label label-warning"><i class="fa fa-warning"></i> Pagamento Pendente</label>'
+                            }
+                        }
+                    },
+                ],
+                order: [[0, "desc"]],
+                "language": {
+                    "lengthMenu": "Exibir _MENU_ registros por página",
+                    "zeroRecords": "Nenhum item encontrado",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Nenhum registro disponível",
+                    "emptyTable": "Sem dados disponíveis na tabela",
+                    "infoFiltered": "(filtrado do total de _MAX_ registros)",
+                    "thousands": ".",
+                    "loadingRecords": "Carregando...",
+                    "processing": "Processando...",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primeiro",
+                        "last": "Último",
+                        "next": "Próximo",
+                        "previous": "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending": ": ativar para classificar a coluna ascendente",
+                        "sortDescending": ": ativar para classificar a coluna descendente"
+                    }
+                }
+            });
+
+            $('input').on('keyup', function () {
+                table.search('').draw();
+            });
+            $('input').on('change', function () {
+                table.search('').draw();
+            });
+            $('select').on('change', function () {
+                table.search('').draw();
+            });
+
+            $('#clear').click(function () {
+                $("form")[0].reset();
+                table.search('').draw();
+            });
+
+        });
+    </script>
+
+{% endblock %}

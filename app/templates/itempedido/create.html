@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">Add ItemPedido</h3>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-xs-12"> 
+ <div class="form-group"> 
+ <label>Pedido:</label> 
+{{ form.pedido }} 
+ </div> 
+ </div> 
+<div class="col-xs-12"> 
+ <div class="form-group"> 
+ <label>Qtd:</label> 
+{{ form.qtd }} 
+ </div> 
+ </div> 
+<div class="col-xs-12"> 
+ <div class="form-group"> 
+ <label>Item:</label> 
+{{ form.item }} 
+ </div> 
+ </div> 
+<div class="col-xs-12"> 
+ <div class="form-group"> 
+ <label>Valor_total:</label> 
+{{ form.valor_total }} 
+ </div> 
+ </div> 
+
+                    </div>
+                    <div class="panel-footer">
+                        <div id="actions" class="row">
+                            <div class="col-md-12">
+                                <button id="btn_salvar" class="btn btn-primary" type="submit">
+                                    Add ItemPedido
+                                </button>
+                                <a href="{% url 'ITEMPEDIDO_list' %}" class="btn btn-default">Back</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#itempedido_link').addClass('active');
+
+            $('#id_pedido').select2({
+    ajax: {
+        url: '/api/pedido/',
+        dataType: 'json',
+        data: function (params) {
+            var query = {
+                id: params.term
+            }
+            return query;
+        },
+        processResults: function (data) {
+            new_data = []
+            data.forEach(function(elem){
+                new_data.push({
+                    id: elem.id,
+                    text: elem.id
+                });
+            });
+            return {
+                results: new_data
+            };
+        }
+    }
+});
+$('#id_item').select2({
+    ajax: {
+        url: '/api/item/',
+        dataType: 'json',
+        data: function (params) {
+            var query = {
+                descricao: params.term
+            }
+            return query;
+        },
+        processResults: function (data) {
+            new_data = []
+            data.forEach(function(elem){
+                new_data.push({
+                    id: elem.id,
+                    text: elem.descricao
+                });
+            });
+            return {
+                results: new_data
+            };
+        }
+    }
+});
+
+
+        });
+    </script>
+{% endblock %}

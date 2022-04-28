@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">View FormaPagamento</h3>
+
+    <div class="row">
+        <div class="col-xs-4"> 
+ <div class="form-group"> 
+ <label>Tipo:</label> 
+
+{{ object.tipo }} 
+ </div> 
+ </div> 
+
+    </div>
+    <hr/>
+    <div id="actions" class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" href="{% url 'FORMAPAGAMENTO_update' formapagamento.pk %}">
+                Edit
+            </a>
+            <a href="{% url 'FORMAPAGAMENTO_list' %}" class="btn btn-default">Back</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#formapagamento_link').addClass('active');
+        });
+    </script>
+{% endblock %}

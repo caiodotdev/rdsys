@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">Atualizar Cliente</h3>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Nome:</label>
+                                {{ form.nome }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Cep:</label>
+                                {{ form.cep }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Endereco:</label>
+                                {{ form.endereco }}
+                            </div>
+                        </div>
+                        {#                        <div class="col-xs-12">#}
+                        {#                            <div class="form-group">#}
+                        {#                                <label>Latitude:</label>#}
+                        {#                                {{ form.latitude }}#}
+                        {#                            </div>#}
+                        {#                        </div>#}
+                        {#                        <div class="col-xs-12">#}
+                        {#                            <div class="form-group">#}
+                        {#                                <label>Longitude:</label>#}
+                        {#                                {{ form.longitude }}#}
+                        {#                            </div>#}
+                        {#                        </div>#}
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Numero:</label>
+                                {{ form.numero }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Bairro:</label>
+                                {{ form.bairro }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Cidade:</label>
+                                {{ form.cidade }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Estado:</label>
+                                {{ form.estado }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Telefone:</label>
+                                {{ form.telefone }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Cpf:</label>
+                                {{ form.cpf }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Cnpj:</label>
+                                {{ form.cnpj }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Email:</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Instagram:</label>
+                                {{ form.instagram }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Tipo:</label>
+                                {{ form.tipo }}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            {{ pedidoset.management_form }}
+                            <table class="table">
+                                <thead><h3>Pedidos</h3></thead>
+                                {% for form in pedidoset.forms %}
+                                    {% if forloop.first %}
+                                        <thead>
+                                        <tr>
+                                            {% for field in form.visible_fields %}
+                                                <th>{{ field.label|capfirst }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                    {% endif %}
+                                    <tr class="pedidoset_row">
+                                        {% for field in form.visible_fields %}
+                                            <td>
+                                                {# Include the hidden fields in the form #}
+                                                {% if forloop.first %}
+                                                    {% for hidden in form.hidden_fields %}
+                                                        {{ hidden }}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {{ field.errors.as_ul }}
+                                                {{ field }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            <script src="{% static 'default/js/jquery.formset.js' %}"></script>
+                            <script type="text/javascript">
+                                $('.pedidoset_row').formset({
+                                    addText: 'Adicionar',
+                                    deleteText: 'Remover',
+                                    prefix: 'pedido_set'
+                                });
+                            </script>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <div id="actions" class="row">
+                            <div class="col-md-12">
+                                <button id="btn_atualizar" class="btn btn-primary" type="submit">
+                                    Atualizar
+                                </button>
+                                <a href="{% url 'CLIENTE_list' %}" class="btn btn-default">Voltar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#cliente_link').addClass('active');
+
+
+        });
+    </script>
+{% endblock %}

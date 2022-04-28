@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">Visualizar Cliente</h3>
+
+    <div class="row">
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Nome:</label>
+
+                {{ object.nome }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Cep:</label>
+
+                {{ object.cep }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Endereco:</label>
+
+                {{ object.endereco }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Numero:</label>
+
+                {{ object.numero }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Cidade:</label>
+
+                {{ object.cidade }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Telefone:</label>
+
+                <a target="_blank"
+                   href="https://api.whatsapp.com/send?phone=55{{ object.telefone }}">{{ object.telefone }}</a>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Cpf:</label>
+
+                {{ object.cpf }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Cnpj:</label>
+
+                {{ object.cnpj }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Email:</label>
+
+                {{ object.email }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Instagram:</label>
+
+                {{ object.instagram }}
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-4">
+            <div class="form-group">
+                <label>Tipo:</label>
+
+                {{ object.tipo }}
+            </div>
+        </div>
+
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-sm-12">
+            <iframe src="https://www.google.com/maps/embed/v1/place?q={{ object.endereco }},{{ object.numero }},{{ object.bairro }}, {{ object.cidade }}&key=AIzaSyAN0om9mFmy1QN6Wf54tXAowK4eT0ZUPrU&zoom=14"
+                    frameborder="0" width="100%" height="500px;"></iframe>
+        </div>
+    </div>
+    <hr/>
+    <div id="list" class="row">
+        <div class="col-sm-12">
+            <h3>Pedidos realizados</h3>
+        </div>
+        <div class="col-md-12">
+            <table id="table" class="table table-striped" cellspacing="0" cellpadding="0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>FORMA_PAGAMENTO</th>
+                    <th>VALOR_TOTAL</th>
+                    <th>VENDEDOR</th>
+                    <th>DATA</th>
+                    <th>STATUS</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+    </div> <!-- /#list -->
+    <hr/>
+    <div id="actions" class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" href="{% url 'CLIENTE_update' cliente.pk %}">
+                Editar
+            </a>
+            <a href="{% url 'CLIENTE_list' %}" class="btn btn-default">Voltar</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#cliente_link').addClass('active');
+
+            var table = $('#table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                responsive: true,
+                dom: "<'row' <'col-xs-6'l><'col-xs-6'f>>rt<'row' <'col-xs-6'Bi><'col-xs-6'p>>",
+                "buttons": [
+                    'copy', 'excel', 'pdf'
+                ],
+                "ajax": "{% url 'pedidos_cliente_json' object.id %}",
+                columnDefs: [
+                    {
+                        targets: 1,
+                        "render": function (data, type, row, meta) {
+                            return '<a href="/pedido/' + row[0] + '/"> ' + row[1] + '</a>';
+                        }
+                    },
+                    {
+                        targets: 5,
+                        "render": function (data, type, row, meta) {
+                            if (row[5] == 'Finalizado') {
+                                return '<label class="label label-success"><i class="fa fa-check-circle"></i> Finalizado</label>'
+                            }
+                            if (row[5] == 'Aberto') {
+                                return '<label class="label label-default"><i class="fa fa-folder-open"></i> Aberto</label>'
+                            }
+                            if (row[5] == 'Em Produção') {
+                                return '<label class="label label-info"><i class="fa fa-refresh"></i> Em Produção</label>'
+                            }
+                            if (row[5] == 'Pagamento Pendente') {
+                                return '<label class="label label-warning"><i class="fa fa-warning"></i> Pagamento Pendente</label>'
+                            }
+                        }
+                    }
+                ],
+                order: [[0, "desc"]],
+                "language": {
+                    "lengthMenu": "Exibir _MENU_ registros por página",
+                    "zeroRecords": "Nenhum item encontrado",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Nenhum registro disponível",
+                    "emptyTable": "Sem dados disponíveis na tabela",
+                    "infoFiltered": "(filtrado do total de _MAX_ registros)",
+                    "thousands": ".",
+                    "loadingRecords": "Carregando...",
+                    "processing": "Processando...",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primeiro",
+                        "last": "Último",
+                        "next": "Próximo",
+                        "previous": "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending": ": ativar para classificar a coluna ascendente",
+                        "sortDescending": ": ativar para classificar a coluna descendente"
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">View ItemOrcamento</h3>
+
+    <div class="row">
+        <div class="col-xs-4"> 
+ <div class="form-group"> 
+ <label>Orcamento:</label> 
+
+{{ object.orcamento }} 
+ </div> 
+ </div> 
+<div class="col-xs-4"> 
+ <div class="form-group"> 
+ <label>Qtd:</label> 
+
+{{ object.qtd }} 
+ </div> 
+ </div> 
+<div class="col-xs-4"> 
+ <div class="form-group"> 
+ <label>Item:</label> 
+
+{{ object.item }} 
+ </div> 
+ </div> 
+<div class="col-xs-4"> 
+ <div class="form-group"> 
+ <label>Valor_total:</label> 
+
+{{ object.valor_total }} 
+ </div> 
+ </div> 
+
+    </div>
+    <hr/>
+    <div id="actions" class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" href="{% url 'ITEMORCAMENTO_update' itemorcamento.pk %}">
+                Edit
+            </a>
+            <a href="{% url 'ITEMORCAMENTO_list' %}" class="btn btn-default">Back</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#itemorcamento_link').addClass('active');
+        });
+    </script>
+{% endblock %}

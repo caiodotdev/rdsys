@@ -1,0 +1,15 @@
+dj-database-url
+Django==3.1.7
+django-cors-headers==3.7.0
+django-extensions==3.0.8
+django-js-asset==1.2.2
+gunicorn
+psycopg2-binary
+pytz==2021.1
+requests
+whitenoise
+django-rest-auth[with_social]
+djangorestframework
+django-filter
+django-datatables-view
+django-money

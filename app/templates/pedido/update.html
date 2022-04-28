@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_utils %}
+{% block content %}
+    <h3 class="page-header">Atualizar Pedido</h3>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Vendedor:</label>
+                                {{ form.vendedor }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Cliente:</label>
+                                {{ form.cliente }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Forma_pagamento:</label>
+                                {{ form.forma_pagamento }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Status:</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Descricao:</label>
+                                {{ form.descricao }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Valor_total:</label>
+                                {{ form.valor_total }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            {{ itempedidoset.management_form }}
+                            <table class="table">
+                                <thead><h3>ItemPedidos</h3></thead>
+                                {% for form in itempedidoset.forms %}
+                                    {% if forloop.first %}
+                                        <thead>
+                                        <tr>
+                                            {% for field in form.visible_fields %}
+                                                <th>{{ field.label|capfirst }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                    {% endif %}
+                                    <tr class="itempedidoset_row">
+                                        {% for field in form.visible_fields %}
+                                            <td>
+                                                {# Include the hidden fields in the form #}
+                                                {% if forloop.first %}
+                                                    {% for hidden in form.hidden_fields %}
+                                                        {{ hidden }}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {{ field.errors.as_ul }}
+                                                {{ field }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            <script src="{% static 'default/js/jquery.formset.js' %}"></script>
+                            <script type="text/javascript">
+                                $('.itempedidoset_row').formset({
+                                    addText: 'Adicionar Item',
+                                    deleteText: 'Remover',
+                                    prefix: 'itempedido_set'
+                                });
+
+                                function getIdRow(element) {
+                                    var id_select = element.attr('id');
+                                    var index_prefix = id_select.indexOf('id_itempedido_set-');
+                                    var index_suffix = id_select.indexOf('-pedido');
+                                    var id_row = id_select.slice(index_prefix + 18, index_suffix);
+                                    return id_row;
+                                }
+
+                                function getIds() {
+                                    var items = $('.itempedidoset_row');
+                                    var ids = [];
+                                    items.each(function (idx, obj) {
+                                        var style = $(obj).attr('style');
+                                        if (style !== 'display: none;') {
+                                            var id_row = getIdRow($('#' + obj.children[0].children[0].id));
+                                            ids.push(id_row);
+                                        }
+                                    });
+                                    return ids;
+                                }
+
+                                function calculateTotal() {
+                                    var totalPedido = 0;
+                                    var ids = getIds();
+                                    console.log(ids);
+                                    ids.forEach(function (id) {
+                                        totalPedido = parseFloat(totalPedido) + parseFloat($('#id_itempedido_set-' + id + '-valor_total_0').val())
+                                    });
+                                    $('#id_valor_total_0').val(totalPedido.toFixed(2));
+                                }
+
+                                function calculateTotalItem(id, valor_unit) {
+                                    var totalItem = 0;
+                                    var qtd = undefined;
+                                    var component_qtd = $('#id_itempedido_set-' + id + '-qtd');
+                                    if (component_qtd.val() === '') {
+                                        $('#id_itempedido_set-' + id + '-qtd').val(1);
+                                        qtd = parseFloat(1);
+                                    } else {
+                                        qtd = parseFloat(component_qtd.val());
+                                    }
+                                    totalItem = qtd * parseFloat(valor_unit);
+                                    $('#id_itempedido_set-' + id + '-valor_total_0').val(totalItem.toFixed(2));
+                                }
+
+                                $('.delete-row').on('click', function () {
+                                    calculateTotal();
+                                });
+
+                                $('.add-row').on('click', function () {
+                                    $('input,select').addClass('form-control');
+                                    $('#id_valor_total_1').hide();
+                                    $('[name$="-valor_total_1"]').hide();
+                                    $('.delete-row').on('click', function () {
+                                        calculateTotal();
+                                    });
+                                    $('select[id^="id_itempedido_set-"]').change(
+                                        function () {
+                                            var id_select = $(this).attr('id');
+                                            var index_prefix = id_select.indexOf('id_itempedido_set-');
+                                            var index_suffix = id_select.indexOf('-item');
+                                            var id_row = id_select.slice(index_prefix + 18, index_suffix);
+                                            var id_item = $(this).val();
+                                            $.get('/api/item/' + String(id_item), function (data) {
+                                                var valor_unit = parseFloat(data['valor_unitario']);
+                                                calculateTotalItem(id_row, valor_unit);
+                                                calculateTotal();
+                                            });
+                                        }
+                                    );
+                                    $('input[id$="-qtd"]').change(function () {
+                                        var id_select = $(this).attr('id');
+                                        var index_prefix = id_select.indexOf('id_itempedido_set-');
+                                        var index_suffix = id_select.indexOf('-qtd');
+                                        var id_row = id_select.slice(index_prefix + 18, index_suffix);
+                                        var id_item = $('#id_itempedido_set-' + id_row + '-item').val();
+                                        $.get('/api/item/' + String(id_item), function (data) {
+                                            var valor_unit = parseFloat(data['valor_unitario']);
+                                            calculateTotalItem(id_row, valor_unit);
+                                            calculateTotal();
+                                        });
+                                    });
+                                });
+                                $('select[id^="id_itempedido_set-"]').change(
+                                    function () {
+                                        var id_select = $(this).attr('id');
+                                        var index_prefix = id_select.indexOf('id_itempedido_set-');
+                                        var index_suffix = id_select.indexOf('-item');
+                                        var id_row = id_select.slice(index_prefix + 18, index_suffix);
+                                        console.log('row itempedido', id_row);
+                                        var id_item = $(this).val();
+                                        $.get('/api/item/' + String(id_item), function (data) {
+                                            var valor_unit = parseFloat(data['valor_unitario']);
+                                            calculateTotalItem(id_row, valor_unit);
+                                            calculateTotal();
+                                        });
+                                    }
+                                );
+                                $('input[id$="-qtd"]').change(function () {
+                                    var id_select = $(this).attr('id');
+                                    var index_prefix = id_select.indexOf('id_itempedido_set-');
+                                    var index_suffix = id_select.indexOf('-qtd');
+                                    var id_row = id_select.slice(index_prefix + 18, index_suffix);
+                                    var id_item = $('#id_itempedido_set-' + id_row + '-item').val();
+                                    $.get('/api/item/' + String(id_item), function (data) {
+                                        var valor_unit = parseFloat(data['valor_unitario']);
+                                        calculateTotalItem(id_row, valor_unit);
+                                        calculateTotal();
+                                    });
+                                });
+
+                            </script>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <div id="actions" class="row">
+                            <div class="col-md-12">
+                                <button id="btn_atualizar" class="btn btn-primary" type="submit">
+                                    Atualizar
+                                </button>
+                                <a href="{% url 'PEDIDO_list' %}" class="btn btn-default">Voltar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#pedido_link').addClass('active');
+
+            $('input,select,textarea').addClass('form-control');
+
+
+            $('#id_valor_total_1').hide();
+            $('[name$="-valor_total_1"]').hide();
+
+            $('#id_vendedor').select2({
+                ajax: {
+                    url: '/api/vendedor/',
+                    dataType: 'json',
+                    data: function (params) {
+                        var query = {
+                            id: params.term
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        new_data = []
+                        data.forEach(function (elem) {
+                            new_data.push({
+                                id: elem.id,
+                                text: elem.id
+                            });
+                        });
+                        return {
+                            results: new_data
+                        };
+                    }
+                }
+            });
+            $('#id_cliente').select2({
+                ajax: {
+                    url: '/api/cliente/',
+                    dataType: 'json',
+                    data: function (params) {
+                        var query = {
+                            nome: params.term
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        new_data = []
+                        data.forEach(function (elem) {
+                            new_data.push({
+                                id: elem.id,
+                                text: elem.nome
+                            });
+                        });
+                        return {
+                            results: new_data
+                        };
+                    }
+                }
+            });
+            $('#id_forma_pagamento').select2({
+                ajax: {
+                    url: '/api/formapagamento/',
+                    dataType: 'json',
+                    data: function (params) {
+                        var query = {
+                            tipo: params.term
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        new_data = []
+                        data.forEach(function (elem) {
+                            new_data.push({
+                                id: elem.id,
+                                text: elem.tipo
+                            });
+                        });
+                        return {
+                            results: new_data
+                        };
+                    }
+                }
+            });
+            $('#id_status').select2({
+                ajax: {
+                    url: '/api/statuspedido/',
+                    dataType: 'json',
+                    data: function (params) {
+                        var query = {
+                            nome_status: params.term
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        new_data = []
+                        data.forEach(function (elem) {
+                            new_data.push({
+                                id: elem.id,
+                                text: elem.nome_status
+                            });
+                        });
+                        return {
+                            results: new_data
+                        };
+                    }
+                }
+            });
+
+        });
+    </script>
+{% endblock %}
