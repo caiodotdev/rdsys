@@ -13,3 +13,4 @@ djangorestframework
 django-filter
 django-datatables-view
 django-money
+pyimgur
