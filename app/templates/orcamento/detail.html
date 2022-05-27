@@ -80,6 +80,39 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('#orcamento_link').addClass('active');
+
+             var table = $('#table').DataTable({
+                "info": true,
+                "lengthChange": true,
+                "pageLength": 10,
+                dom: "<'row' <'col-xs-6'l><'col-xs-6'f>>rt<'row' <'col-xs-6'Bi><'col-xs-6'p>>",
+                "buttons": [
+                    'copy', 'excel', 'pdf'
+                ],
+                order: [[0, "desc"]],
+                "language": {
+                    "lengthMenu": "Exibir _MENU_ registros por página",
+                    "zeroRecords": "Nenhum item encontrado",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Nenhum registro disponível",
+                    "emptyTable": "Sem dados disponíveis na tabela",
+                    "infoFiltered": "(filtrado do total de _MAX_ registros)",
+                    "thousands": ".",
+                    "loadingRecords": "Carregando...",
+                    "processing": "Processando...",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primeiro",
+                        "last": "Último",
+                        "next": "Próximo",
+                        "previous": "Anterior"
+                    },
+                    "aria": {
+                        "sortAscending": ": ativar para classificar a coluna ascendente",
+                        "sortDescending": ": ativar para classificar a coluna descendente"
+                    }
+                }
+            });
         });
     </script>
 {% endblock %}

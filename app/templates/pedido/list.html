@@ -23,13 +23,18 @@
             color: whitesmoke;
         }
 
+        .panel-danger {
+            background: #ff4040;
+            color: whitesmoke;
+        }
+
         h1.pull-left {
             font-size: 3em;
         }
     </style>
     <div class="row">
         <div class="col-sm-3">
-            <div class="panel panel-default">
+            <div class="panel panel-danger">
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-xs-12">
@@ -46,7 +51,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="panel panel-info">
+            <div class="panel panel-warning">
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-xs-12">
@@ -80,7 +85,7 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="panel panel-warning">
+            <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-xs-12">
@@ -189,13 +194,13 @@
                                 return '<label class="label label-success"><i class="fa fa-check-circle"></i> Finalizado</label>'
                             }
                             if (row[6] == 'Aberto') {
-                                return '<label class="label label-default"><i class="fa fa-folder-open"></i> Aberto</label>'
+                                return '<label class="label label-danger"><i class="fa fa-folder-open"></i> Aberto</label>'
                             }
                             if (row[6] == 'Em Produção') {
-                                return '<label class="label label-info"><i class="fa fa-refresh"></i> Em Produção</label>'
+                                return '<label class="label label-warning"><i class="fa fa-refresh"></i> Em Produção</label>'
                             }
                             if (row[6] == 'Pagamento Pendente') {
-                                return '<label class="label label-warning"><i class="fa fa-warning"></i> Pagamento Pendente</label>'
+                                return '<label class="label label-info"><i class="fa fa-warning"></i> Pagamento Pendente</label>'
                             }
                         }
                     },
